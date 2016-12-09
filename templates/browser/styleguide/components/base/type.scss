@@ -1,0 +1,51 @@
+$sans-serif: "Open Sans", sans-serif;
+
+.ss-lt {
+    font-family: $sans-serif;
+    font-weight: 300;
+}
+
+.ss-rg {
+    font-family: $sans-serif;
+    font-weight: 400;
+}
+
+.ss-sbd {
+    font-family: $sans-serif;
+    font-weight: 600;
+}
+
+b,
+strong,
+.ss-bd {
+    font-family: $sans-serif;
+    font-weight: 700;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+// h2 {
+//     @extend .s-lt;
+
+//     font-size: 3rem;
+// }
+
+.h3 {
+    @extend .ss-bd;
+
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+p {
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}

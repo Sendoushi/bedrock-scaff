@@ -1,0 +1,19 @@
+$icon-size: 1em;
+
+.icon__wrapper {
+    line-height: 0;
+
+    &,
+    + .icon__label {
+        display: inline-block;
+        vertical-align: middle;
+    }
+}
+
+.icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: $icon-size;
+    height: $icon-size;
+    fill: currentColor;
+}

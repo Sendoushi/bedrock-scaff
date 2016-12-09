@@ -1,0 +1,16 @@
+image: node:6.6.0
+
+before_script:
+  - npm install
+<% if (!isNode) { %>
+devbuild:
+  script:
+    - npm run build
+
+prodbuild:
+  script:
+    - npm run build-prod
+<% } %>
+test:
+  script:
+    - npm run test

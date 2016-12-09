@@ -1,0 +1,16 @@
+[ignore]
+.*/app
+.*/extensions
+.*/public
+.*/build
+.*/www
+.*/node_modules
+.*/vendor
+
+[include]
+./src/**/*.js
+
+[libs]
+
+[options]
+log.file=./logs/flow.log

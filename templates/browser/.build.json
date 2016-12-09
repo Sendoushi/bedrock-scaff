@@ -1,0 +1,180 @@
+{
+    "projectId": "<%= projectId %>",
+    "projectName": "<%= projectName %>",
+    "tasks": [{
+        "type": "clean",
+        "env": "*",
+        "data": [
+            { "src": "<%= buildSrc %>/*", "ignore": "<%= buildSrc %>/sg" },
+            {"src": "./styleguide/built_*" },
+            {"src": "./src/**/built_*" }
+        ]
+    }, {
+        "type": "clean",
+        "env": "prod",
+        "data": [
+            { "src": "<%= buildSrc %>/*" }
+        ]
+    }, {
+        "type": "sprite",
+        "env": "*",
+        "data": [{
+            "src": "./styleguide/components/**/*.svg",
+            "dest": "<%= buildSrc %>/_assets/built_svg",
+            "ignore": ["./styleguide/components/**/logo*.svg"],
+            "options": {
+                "preview": false,
+                "mode": "defs",
+                "selector": "%f",
+                "svgId": "%f",
+                "transformData": "var data = arguments[0]; var i; for (i = 0; i < data.svg.length; i += 1) { data.svg[i].width = null; data.svg[i].height = null; data.svg[i].data = data.svg[i].data.replace(/<svg(.*)viewBox=/g, '<svg viewBox='); } return data;"
+            }
+        }, {
+            "src": ["./styleguide/**/*.png"],
+            "dest": "<%= buildSrc %>/_assets/sprite.png",
+            "ignore": ["./styleguide/components/**/favicons/**"]
+        }]
+    }, {
+        "type": "styleguide",
+        "env": "dev",
+        "data": [{
+            "src": "./styleguide",
+            "dest": "<%= buildSrc %>/sg",
+            "options": {
+                "layouts": {
+                    "general": "general_layout.html",
+                    "pattern": "pattern_layout.html",
+                    "pattern_no_code": "pattern_no_code_layout.html"
+                },
+                "components": [
+                    "base/base.json",
+                    "layout/favicons.json",
+                    "layout/wrapper.json",
+                    "components/icons.json",
+                    "components/logo.json"
+                ],
+                "generalLayout": "general",
+                "patternLayout": "pattern",
+                "scriptCompileOptions": {
+                    <% if (hasJquery) { %>"externals": { "jquery": "jQuery" },
+                    <% } %>"cache": false,
+                    "debug": true,
+                    "devtool": "source-map",
+                    "plugins": [{
+                        "name": "define",
+                        "args": [{
+                            "IS_BROWSER": true
+                        }]
+                    }<% if (hasJquery) { %>, {
+                        "name": "provide",
+                        "args": [{
+                            "$": "jquery",
+                            "jQuery": "jquery"
+                        }]
+                    }]<% } %>
+                },
+                "styleCompileOptions": {
+                    "minify": false,
+                    "sourceMap": true,
+                    "autoprefixer": []
+                }
+            }
+        }]
+    }, {
+        "type": "style",
+        "env": "dev",
+        "data": [{
+            "src": "./src/style.scss",
+            "dest": "<%= buildSrc %>",
+            "options": {
+                "minify": false,
+                "sourceMap": true,
+                "autoprefixer": []
+            }
+        }]
+    }, {
+        "type": "style",
+        "env": "prod",
+        "data": [{
+            "src": "./src/style.scss",
+            "dest": "<%= buildSrc %>"
+        }]
+    }, {
+        "type": "script",
+        "env": "dev",
+        "data": [{
+            "src": "./src/main.js",
+            "dest": "<%= buildSrc %>",
+            "options": {
+                <% if (hasJquery) { %>,"externals": { "jquery": "jQuery" },
+                <% } %>"cache": false,
+                "debug": true,
+                "devtool": "source-map",
+                "plugins": [
+                    { "name": "define", "args": [{ "IS_BROWSER": true }] }<% if (hasJquery) { %>,
+                    { "name": "provide", "args": [{ "$": "jquery", "jQuery": "jquery" }] }<% } %>
+                ]<% if (hasES6 || hasFlow) { %>,
+                "module": {
+                    "loaders": [
+                        {
+                            "test": "/\\.js$/",
+                            "exclude": "/(node_modules|bower_components)/",
+                            "loader": "babel-loader",
+                            "query": {
+                                <% if (hasES6) { %>,"presets": ["es2015"]<% } %><% if (hasFlow) { %>,
+                                "plugins": ["syntax-flow", "transform-flow-strip-types", "transform-flow-comments"]<% } %>
+                            }
+                        }
+                    ]
+                }<% } %>
+            }
+        }]
+    }, {
+        "type": "script",
+        "env": "prod",
+        "data": [{
+            "src": "./src/main.js",
+            "dest": "<%= buildSrc %>",
+            "options": {
+                "externals": { "jquery": "jQuery" },
+                "plugins": [
+                    { "name": "define", "args": [{ "IS_BROWSER": true, "process.env": { "NODE_ENV": "production" } }] },
+                    { "name": "dedupe" },
+                    <% if (hasJquery) { %>{ "name": "provide", "args": [{ "$": "jquery", "jQuery": "jquery" }] },
+                    <% } %>{ "name": "uglify", "args": [{
+                        "mangle": { "except": ["$", "exports", "require"] },
+                        "compress": { "warnings": false }, "comments": false, "sourceMap": false
+                    }] }
+                ]<% if (hasES6 || hasFlow) { %>,
+                "module": {
+                    "loaders": [
+                        {
+                            "test": "/\\.js$/",
+                            "exclude": "/(node_modules|bower_components)/",
+                            "loader": "babel-loader",
+                            "query": {
+                                <% if (hasES6) { %>,"presets": ["es2015"]<% } %>,
+                                "plugins": [
+                                    <% if (hasFlow) { %>"syntax-flow", "transform-flow-strip-types", "transform-flow-comments",
+                                    <% } %>"transform-remove-console", "transform-remove-debugger"
+                                ]<% } %>
+                            }
+                        }
+                    ]
+                }<% } %>
+        }]
+    }, {
+        "type": "copy",
+        "env": "*",
+        "data": [
+            <% if (!hasMarkup) { %>{ "src": "./src/**/*.html", "dest": "<%= buildSrc %>" },
+            { "src": "./src/**/*.twig", "dest": "<%= buildSrc %>" },
+            { "src": "./src/**/*.php", "dest": "<%= buildSrc %>" },
+            <% } %>{ "src": "./src/**/*.png", "dest": "<%= buildSrc %>" },
+            { "src": "./src/**/*.jpg", "dest": "<%= buildSrc %>" },
+            { "src": "./src/**/*.ico", "dest": "<%= buildSrc %>" },
+            { "src": "./src/**/*.yml", "dest": "<%= buildSrc %>" },
+            { "src": "./src/**/*.svg", "dest": "<%= buildSrc %>" }
+        ]
+    }]
+}

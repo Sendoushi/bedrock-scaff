@@ -1,0 +1,7 @@
+{
+    "id": "icons",
+    "name": "Icons",
+
+    "style": "icons.scss",
+    "modifiers": ["arrow-down"]
+}
