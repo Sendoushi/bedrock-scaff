@@ -135,7 +135,7 @@ function runTemplates(config) {
                     return;
                 }
             } else {
-                if (src.replace('.es6', '') === src) {
+                if (src.replace('.es6', '') === src && src.replace('.spec', '') === src) {
                     return;
                 }
             }
